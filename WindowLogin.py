@@ -1,7 +1,6 @@
 from tkinter import *
-
 # Criando a janela de login
-class LoginUser():
+class LoginUser:
 
         main_login_window = Tk()
         main_login_window.title('Sistema de Cadastro de Usuários')
