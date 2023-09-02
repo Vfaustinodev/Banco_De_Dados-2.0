@@ -6,11 +6,6 @@ import os
 
 class CreateAccount:
 
-    rec_hours = datetime.now()
-    HOURS = rec_hours.hour
-    MINUTES = rec_hours.minute
-    SECONDS = rec_hours.second
-    CAPTURE_HOUR = f'{HOURS:02}:{MINUTES:02}:{SECONDS:02}'
     ANO_ATUAL = 2023
     CAMINHO_ARQUIVO = os.path.dirname(__file__)
 
@@ -112,6 +107,12 @@ class CreateAccount:
 
     def recept_informations(self):
 
+        rec_hours = datetime.now()
+        HOURS = rec_hours.hour
+        MINUTES = rec_hours.minute
+        SECONDS = rec_hours.second
+        CAPTURE_HOUR = f'{HOURS:02}:{MINUTES:02}:{SECONDS:02}'
+
         rec_entry_login = self.entry_login.get()
         rec_entry_passw = self.entry_password.get()
         rec_entry_age = self.entry_age.get()
@@ -121,7 +122,7 @@ class CreateAccount:
         rec_year_birthday = self.ANO_ATUAL - int(rec_entry_age)
         intercept_gender = f'{self.obtain_gender()}'
 
-        print(rec_entry_cpf, rec_entry_login, rec_combo_country, rec_entry_age, rec_entry_email, rec_entry_passw, rec_year_birthday, self.CAPTURE_HOUR, intercept_gender)
+        print(rec_entry_cpf, rec_entry_login, rec_combo_country, rec_entry_age, rec_entry_email, rec_entry_passw, rec_year_birthday, CAPTURE_HOUR, intercept_gender)
 
 
     def obtain_gender(self):
