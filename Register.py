@@ -1,14 +1,22 @@
 from tkinter.ttk import *
 import customtkinter
+from datetime import datetime
 from tkinter import *
 import os
 
 class CreateAccount:
 
+    rec_hours = datetime.now()
+    HOURS = rec_hours.hour
+    MINUTES = rec_hours.minute
+    SECONDS = rec_hours.second
+    CAPTURE_HOUR = f'{HOURS:02}:{MINUTES:02}:{SECONDS:02}'
+    ANO_ATUAL = 2023
     CAMINHO_ARQUIVO = os.path.dirname(__file__)
 
     def __init__(self):
-        self.radio_gender()
+
+        self.create_gender()
         self.button_register()
         self.labels_infos()
         self.entry_infos()
@@ -38,16 +46,6 @@ class CreateAccount:
     combo_country.current(30)
     combo_country.place(x=261, y=184)
 
-    # Gêneros opções
-    def radio_gender(self):
-        self.gender_user1 = Radiobutton(self.create_account_window, text='Masculino', value=1, bg='#faf8f7', cursor='hand2')
-        self.gender_user1.place(x=150, y=350)
-
-        self.gender_user2 = Radiobutton(self.create_account_window, text='Feminino', value=2, bg='#faf8f7', cursor='hand2')
-        self.gender_user2.place(x=250, y=350)
-
-        self.gender_user3 = Radiobutton(self.create_account_window, text='Outros', value=3, bg='#faf8f7', cursor='hand2')
-        self.gender_user3.place(x=350, y=350)
 
     def center(self, win):
         win.update_idletasks()
@@ -92,25 +90,58 @@ class CreateAccount:
 
     def entry_infos(self):
         
-        self.entry_login = Entry(self.create_account_window, width=40, text='Nome de usuário', font=('Arial 11'), bg='#faf8f7', relief='raised')
+        self.entry_login = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_login.place(x=155, y=50)
 
-        self.entry_password = Entry(self.create_account_window, width=40, text='Nome de usuário', font=('Arial 11'), bg='#faf8f7', relief='raised')
+        self.entry_password = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_password.place(x=155, y=100)
 
-        self.entry_age = Entry(self.create_account_window, width=40, text='Nome de usuário', font=('Arial 11'), bg='#faf8f7', relief='raised')
+        self.entry_age = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_age.place(x=155, y=150)
 
-        self.entry_cpf = Entry(self.create_account_window, width=40, text='Nome de usuário', font=('Arial 11'), bg='#faf8f7', relief='raised')
+        self.entry_cpf = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_cpf.place(x=155, y=240)
 
-        self.entry_email = Entry(self.create_account_window, width=40, text='Nome de usuário', font=('Arial 11'), relief='raised', bg='#faf8f7')
+        self.entry_email = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
         self.entry_email.place(x=155, y=290)
 
     def button_register(self):
 
-        button_register = customtkinter.CTkButton(master=self.create_account_window, width=150, height=30, text='Criar conta', cursor='hand2')
+        button_register = customtkinter.CTkButton(master=self.create_account_window, command=self.recept_informations, width=150, height=30, text='Criar conta', cursor='hand2')
         button_register.place(x=152, y=400)
+
+    def recept_informations(self):
+
+        rec_entry_login = self.entry_login.get()
+        rec_entry_passw = self.entry_password.get()
+        rec_entry_age = self.entry_age.get()
+        rec_combo_country = self.combo_country.get()
+        rec_entry_cpf = self.entry_cpf.get()
+        rec_entry_email = self.entry_email.get()
+        rec_year_birthday = self.ANO_ATUAL - int(rec_entry_age)
+        intercept_gender = f'{self.obtain_gender()}'
+
+        print(rec_entry_cpf, rec_entry_login, rec_combo_country, rec_entry_age, rec_entry_email, rec_entry_passw, rec_year_birthday, self.CAPTURE_HOUR, intercept_gender)
+
+
+    def obtain_gender(self):
+        rec_gender = self.selection_gender.get()
+        return rec_gender
+
+    # Gêneros opções
+    def create_gender(self):
+
+        self.selection_gender = StringVar()
+
+        gender_male = Radiobutton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', bg='#faf8f7', cursor='hand2', variable=self.selection_gender)
+        gender_male.place(x=150, y=350)
+
+        gender_female = Radiobutton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', bg='#faf8f7', cursor='hand2', variable=self.selection_gender)
+        gender_female.place(x=250, y=350)
+
+        gender_others = Radiobutton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', bg='#faf8f7', cursor='hand2', variable=self.selection_gender)
+        gender_others.place(x=350, y=350)
+
 
 CreateAccount()
     
