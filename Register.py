@@ -7,9 +7,11 @@ import os
 
 class CreateAccount:
 
+    #Variaveis de flexibilidade
     ANO_ATUAL = 2023
     CAMINHO_ARQUIVO = os.path.dirname(__file__)
 
+    #Conexão com o Banco de Dados
     try:
         connected = connect(
             host='localhost',
@@ -23,7 +25,7 @@ class CreateAccount:
     except:
         exit()
 
-
+    #Função construtora sendo utilizada para alinhamento de funções e chamado de eventos dentro da janela.
     def __init__(self):
 
         self.create_gender()
@@ -33,6 +35,8 @@ class CreateAccount:
         self.center(self.create_account_window)
         self.create_account_window.mainloop()
 
+
+    # Método que faz a leitura do arquivo onde contém todos os paises do mundo e envia para uma lista que vai ser lida pelo ComboBox.
     country_add = []
     with open(CAMINHO_ARQUIVO + './files/country.txt', 'r', encoding='utf8') as country_entry:
 
@@ -40,9 +44,11 @@ class CreateAccount:
             formatin_country = indice.strip('\n')
             country_add.append(formatin_country)
 
+    #Escolhendo o estilo da janela.
     customtkinter.set_appearance_mode('dark')
     customtkinter.set_default_color_theme('dark-blue')
 
+    #Criando a janela utilizando customtkinter.
     create_account_window = customtkinter.CTk()
     create_account_window.title('Sistema de Cadastro de Usuários')
     create_account_window.geometry('600x550')
@@ -56,8 +62,9 @@ class CreateAccount:
     combo_country.current(30)
     combo_country.place(x=261, y=184)
 
-
+    #Função responsável em fazer com que a janela do aplicativo inicie sempre no centro da tela.
     def center(self, win):
+
         win.update_idletasks()
 
         width = win.winfo_width()
@@ -75,6 +82,7 @@ class CreateAccount:
 
         win.deiconify()
 
+    #Função responsável por sinalizar onde o usuário vai digitar determinada informação.
     def labels_infos(self):
 
         self.label_login = Label(self.create_account_window, width=20, height=1, text='Nome de usuário', bg='#faf8f7')
@@ -97,7 +105,8 @@ class CreateAccount:
 
         self.label_gender = Label(self.create_account_window, width=20, height=1, text='Gênero', bg='#faf8f7')
         self.label_gender.place(x=103, y=320)
-
+    
+    #Função responsável por receber as informações digitadas pelo usuário.
     def entry_infos(self):
         
         self.entry_login = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
@@ -116,18 +125,21 @@ class CreateAccount:
         self.entry_email.place(x=155, y=290)
 
     def button_register(self):
-
+        
+        #Criando botão de registro
         button_register = customtkinter.CTkButton(master=self.create_account_window, command=self.recept_informations, width=150, height=30, text='Criar conta', cursor='hand2')
         button_register.place(x=152, y=400)
 
     def recept_informations(self):
-
+        
+        #Capturando o horário exato em que o registrado é feito.
         rec_hours = datetime.now()
         HOURS = rec_hours.hour
         MINUTES = rec_hours.minute
         SECONDS = rec_hours.second
         CAPTURE_HOUR = f'{HOURS:02}:{MINUTES:02}:{SECONDS:02}'
 
+        #Capturando os dados de entrada dos metódos de entrada.
         rec_entry_login = self.entry_login.get()
         rec_entry_passw = self.entry_password.get()
         rec_entry_age = self.entry_age.get()
@@ -137,14 +149,17 @@ class CreateAccount:
         rec_year_birthday = self.ANO_ATUAL - int(rec_entry_age)
         intercept_gender = f'{self.obtain_gender()}'
 
+        #Enviando as informações obtidas na entrada para o banco de dados.
         SENDING_INFORMATIONS = f'''INSERT INTO db_users.tb_users_registed
         (login_user, password_user, age, country, year_of_birthday, cpf_user, email_user, registed_hour, gender_user) 
         VALUE ('{str(rec_entry_login)}', '{str(rec_entry_passw)}', '{int(rec_entry_age)}', '{str(rec_combo_country)}',
         '{int(rec_year_birthday)}', '{str(rec_entry_cpf)}', '{str(rec_entry_email)}', '{str(CAPTURE_HOUR)}', '{str(intercept_gender)}')
-'''
+'''     
+        #Confirmando o envio dos dados ao Banco de Dados.
         self.cursor.execute(SENDING_INFORMATIONS)
         self.connected.commit()
 
+        #Limpando as entradas, para facilitar a criação de uma nova conta.
         self.entry_login.delete(0, END)
         self.entry_password.delete(0, END)
         self.entry_age.delete(0, END)
@@ -155,20 +170,20 @@ class CreateAccount:
     def obtain_gender(self):
         rec_gender = self.selection_gender.get()
         return rec_gender
-
-    # Gêneros opções
+    
+    # Criando as opções de gêneros
     def create_gender(self):
 
         self.selection_gender = StringVar()
 
-        gender_male = Radiobutton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', bg='#faf8f7', cursor='hand2', variable=self.selection_gender)
+        gender_male = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', cursor='hand2', variable=self.selection_gender)
         gender_male.place(x=150, y=350)
 
-        gender_female = Radiobutton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', bg='#faf8f7', cursor='hand2', variable=self.selection_gender)
-        gender_female.place(x=250, y=350)
+        gender_female = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', cursor='hand2', variable=self.selection_gender)
+        gender_female.place(x=260, y=350)
 
-        gender_others = Radiobutton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', bg='#faf8f7', cursor='hand2', variable=self.selection_gender)
-        gender_others.place(x=350, y=350)
+        gender_others = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', cursor='hand2', variable=self.selection_gender)
+        gender_others.place(x=370, y=350)
 
 
 CreateAccount()
