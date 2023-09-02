@@ -2,12 +2,27 @@ from tkinter.ttk import *
 import customtkinter
 from datetime import datetime
 from tkinter import *
+from mysql.connector import connect
 import os
 
 class CreateAccount:
 
     ANO_ATUAL = 2023
     CAMINHO_ARQUIVO = os.path.dirname(__file__)
+
+    try:
+        connected = connect(
+            host='localhost',
+            database='db_users',
+            user='root',
+            password='root'
+        )
+
+        if connected.is_connected():
+            cursor = connected.cursor()
+    except:
+        exit()
+
 
     def __init__(self):
 
@@ -122,8 +137,20 @@ class CreateAccount:
         rec_year_birthday = self.ANO_ATUAL - int(rec_entry_age)
         intercept_gender = f'{self.obtain_gender()}'
 
-        print(rec_entry_cpf, rec_entry_login, rec_combo_country, rec_entry_age, rec_entry_email, rec_entry_passw, rec_year_birthday, CAPTURE_HOUR, intercept_gender)
+        SENDING_INFORMATIONS = f'''INSERT INTO db_users.tb_users_registed
+        (login_user, password_user, age, country, year_of_birthday, cpf_user, email_user, registed_hour, gender_user) 
+        VALUE ('{str(rec_entry_login)}', '{str(rec_entry_passw)}', '{int(rec_entry_age)}', '{str(rec_combo_country)}',
+        '{int(rec_year_birthday)}', '{str(rec_entry_cpf)}', '{str(rec_entry_email)}', '{str(CAPTURE_HOUR)}', '{str(intercept_gender)}')
+'''
+        self.cursor.execute(SENDING_INFORMATIONS)
+        self.connected.commit()
 
+        self.entry_login.delete(0, END)
+        self.entry_password.delete(0, END)
+        self.entry_age.delete(0, END)
+        self.combo_country.current(30)
+        self.entry_cpf.delete(0, END)
+        self.entry_email.delete(0, END)
 
     def obtain_gender(self):
         rec_gender = self.selection_gender.get()
