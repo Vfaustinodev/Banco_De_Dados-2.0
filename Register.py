@@ -4,6 +4,8 @@ from datetime import datetime
 from tkinter import *
 from mysql.connector import connect
 import os
+import re
+from time import sleep
 
 class CreateAccount:
 
@@ -130,7 +132,99 @@ class CreateAccount:
         button_register = customtkinter.CTkButton(master=self.create_account_window, command=self.recept_informations, width=150, height=30, text='Criar conta', cursor='hand2')
         button_register.place(x=152, y=400)
 
+        button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.cpf_validating, width=50, height=25, text='Verificar', cursor='hand2')
+        button_valid_cpf.place(x=490, y=238)
+
     def recept_informations(self):
+
+        if self.cpf_validating() == True:
+            #Enviando os dados para o banco
+            self.sendind_dates()
+
+            #Timer para ver alterações
+            sleep(1)
+            #Limpando as entradas, para facilitar a criação de uma nova conta.
+            self.entry_login.delete(0, END)
+            self.entry_password.delete(0, END)
+            self.entry_age.delete(0, END)
+            self.combo_country.current(30)
+            self.entry_cpf.delete(0, END)
+            self.entry_email.delete(0, END)
+        else:
+            self.entry_cpf.delete(0, END)
+
+    def obtain_gender(self):
+        rec_gender = self.selection_gender.get()
+        return rec_gender
+    
+    # Criando as opções de gêneros
+    def create_gender(self):
+
+        self.selection_gender = StringVar()
+
+        gender_male = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', cursor='hand2', variable=self.selection_gender)
+        gender_male.place(x=150, y=350)
+
+        gender_female = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', cursor='hand2', variable=self.selection_gender)
+        gender_female.place(x=260, y=350)
+
+        gender_others = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', cursor='hand2', variable=self.selection_gender)
+        gender_others.place(x=370, y=350)
+
+    def validate_cpf(self, cpf):
+        
+        cpf_formating = f"{cpf[0:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:11]}"
+        
+        if not re.match(r'\d{3}\.\d{3}\.\d{3}-\d{2}', cpf_formating):
+            return False
+        
+        numbers = [int(digit) for digit in cpf_formating if digit.isdigit()]
+        
+        if len(numbers) != 11 or len(set(numbers)) == 1:
+            return False
+        
+        # Validação do segundo dígito verificador:
+        sum_of_products = sum(a*b for a, b in zip(numbers[0:9], range(10, 1, -1)))
+        expected_digit = (sum_of_products * 10 % 11) % 10
+        if numbers[9] != expected_digit:
+            return False
+
+        # Validação do segundo dígito verificador:
+        sum_of_products = sum(a*b for a, b in zip(numbers[0:10], range(11, 1, -1)))
+        expected_digit = (sum_of_products * 10 % 11) % 10
+        if numbers[10] != expected_digit:
+            return False
+        
+        return True
+
+    def cpf_validating(self):
+
+        rec_entry_cpf = self.entry_cpf.get()
+
+        if self.validate_cpf(rec_entry_cpf) == True:
+            self.label_verify()
+            return True
+        
+        else:
+            self.label_verify()
+            self.label_confirmation['text'] = 'ERROR!'
+            self.label_confirmation['fg'] = 'red'
+            self.label_confirmation['width'] = 6
+            self.label_confirmation.place(x=100, y=241)
+            
+    def label_verify(self):
+
+        self.label_confirmation = Label(self.create_account_window, width=6, height=1, text='OK!', fg='green', bg='#faf8f7')
+        self.label_confirmation.place(x=100, y=241)
+            
+    def sendind_dates(self):
+
+        #Capturando a data exata de registro.
+        rec_date = datetime.now()
+        DAY = rec_date.day
+        MONTH = rec_date.month
+        YEAR = rec_date.year
+        CAPTURE_DATE = f'{DAY:02}/{MONTH:02}/{YEAR}'
         
         #Capturando o horário exato em que o registrado é feito.
         rec_hours = datetime.now()
@@ -151,40 +245,14 @@ class CreateAccount:
 
         #Enviando as informações obtidas na entrada para o banco de dados.
         SENDING_INFORMATIONS = f'''INSERT INTO db_users.tb_users_registed
-        (login_user, password_user, age, country, year_of_birthday, cpf_user, email_user, registed_hour, gender_user) 
+        (login_user, password_user, age, country, year_of_birthday, cpf_user, email_user, registed_hour, gender_user, registed_date) 
         VALUE ('{str(rec_entry_login)}', '{str(rec_entry_passw)}', '{int(rec_entry_age)}', '{str(rec_combo_country)}',
-        '{int(rec_year_birthday)}', '{str(rec_entry_cpf)}', '{str(rec_entry_email)}', '{str(CAPTURE_HOUR)}', '{str(intercept_gender)}')
-'''     
+        '{int(rec_year_birthday)}', '{str(rec_entry_cpf)}', '{str(rec_entry_email)}', '{str(CAPTURE_HOUR)}', '{str(intercept_gender)}', '{str(CAPTURE_DATE)}')
+        '''
+
         #Confirmando o envio dos dados ao Banco de Dados.
         self.cursor.execute(SENDING_INFORMATIONS)
         self.connected.commit()
 
-        #Limpando as entradas, para facilitar a criação de uma nova conta.
-        self.entry_login.delete(0, END)
-        self.entry_password.delete(0, END)
-        self.entry_age.delete(0, END)
-        self.combo_country.current(30)
-        self.entry_cpf.delete(0, END)
-        self.entry_email.delete(0, END)
-
-    def obtain_gender(self):
-        rec_gender = self.selection_gender.get()
-        return rec_gender
-    
-    # Criando as opções de gêneros
-    def create_gender(self):
-
-        self.selection_gender = StringVar()
-
-        gender_male = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', cursor='hand2', variable=self.selection_gender)
-        gender_male.place(x=150, y=350)
-
-        gender_female = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', cursor='hand2', variable=self.selection_gender)
-        gender_female.place(x=260, y=350)
-
-        gender_others = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', cursor='hand2', variable=self.selection_gender)
-        gender_others.place(x=370, y=350)
-
-
-CreateAccount()
-    
+if __name__ == '__main__':
+    CreateAccount()

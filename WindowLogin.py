@@ -121,4 +121,5 @@ class LoginUser:
         send_button = Button(self.main_login_window, command=self.passw_getter, width=34, height=2, text='Entrar', font=('Arial 10'), overrelief='groove', bg='blue', fg='white')
         send_button.place(x=91.5, y=260)
 
-LoginUser()
+if __name__ == '__main__':
+    LoginUser()
