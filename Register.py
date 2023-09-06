@@ -6,12 +6,12 @@ from mysql.connector import connect
 import os
 import re
 from time import sleep
-
 class CreateAccount:
 
     #Variaveis de flexibilidade
-    ANO_ATUAL = 2023
-    CAMINHO_ARQUIVO = os.path.dirname(__file__)
+    rec_year_actual = datetime.now()
+    ACTUAL_YEAR = rec_year_actual.year
+    PATH_FILE = os.path.dirname(__file__)
 
     #Conexão com o Banco de Dados
     try:
@@ -37,10 +37,9 @@ class CreateAccount:
         self.center(self.create_account_window)
         self.create_account_window.mainloop()
 
-
     # Método que faz a leitura do arquivo onde contém todos os paises do mundo e envia para uma lista que vai ser lida pelo ComboBox.
     country_add = []
-    with open(CAMINHO_ARQUIVO + './files/country.txt', 'r', encoding='utf8') as country_entry:
+    with open(PATH_FILE + './files/country.txt', 'r', encoding='utf8') as country_entry:
 
         for indice in country_entry.readlines():
             formatin_country = indice.strip('\n')
@@ -55,7 +54,7 @@ class CreateAccount:
     create_account_window.title('Sistema de Cadastro de Usuários')
     create_account_window.geometry('600x550')
     create_account_window.config(bg='#faf8f7')
-    create_account_window.iconbitmap(CAMINHO_ARQUIVO+r'./icons/login.ico')
+    create_account_window.iconbitmap(PATH_FILE+r'./icons/login.ico')
     create_account_window.resizable(width=False, height=False)
 
     # Adicionando os paises ao Combobox
@@ -135,28 +134,36 @@ class CreateAccount:
         button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.cpf_validating, width=50, height=25, text='Verificar', cursor='hand2')
         button_valid_cpf.place(x=490, y=238)
 
+        button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_nickname, width=50, height=25, text='Verificar', cursor='hand2')
+        button_valid_cpf.place(x=490, y=49)
+
+    #Função responsavél por receber e validar duas funções, função de Label e função de envio de dados ao Banco.
     def recept_informations(self):
 
         if self.cpf_validating() == True:
-            #Enviando os dados para o banco
-            self.sendind_dates()
+            pass
+            if self.verify_nickname() == True:
+                #Enviando os dados para o banco
+                self.sending_dates()
+                #Timer para ver alterações
+                sleep(1)
+                self.label_confirmation['text'] = ''
+                #Limpando as entradas, para facilitar a criação de uma nova conta.
+                self.entry_login.delete(0, END)
+                self.entry_password.delete(0, END)
+                self.entry_age.delete(0, END)
+                self.combo_country.current(30)
+                self.entry_cpf.delete(0, END)
+                self.entry_email.delete(0, END)
+            elif self.verify_nickname() == False:
+                self.entry_login.delete(0, END)
 
-            #Timer para ver alterações
-            sleep(1)
-            #Limpando as entradas, para facilitar a criação de uma nova conta.
-            self.entry_login.delete(0, END)
-            self.entry_password.delete(0, END)
-            self.entry_age.delete(0, END)
-            self.combo_country.current(30)
-            self.entry_cpf.delete(0, END)
-            self.entry_email.delete(0, END)
         else:
             self.entry_cpf.delete(0, END)
 
     def obtain_gender(self):
         rec_gender = self.selection_gender.get()
         return rec_gender
-    
     # Criando as opções de gêneros
     def create_gender(self):
 
@@ -217,8 +224,7 @@ class CreateAccount:
         self.label_confirmation = Label(self.create_account_window, width=6, height=1, text='OK!', fg='green', bg='#faf8f7')
         self.label_confirmation.place(x=100, y=241)
             
-    def sendind_dates(self):
-
+    def sending_dates(self):
         #Capturando a data exata de registro.
         rec_date = datetime.now()
         DAY = rec_date.day
@@ -240,19 +246,44 @@ class CreateAccount:
         rec_combo_country = self.combo_country.get()
         rec_entry_cpf = self.entry_cpf.get()
         rec_entry_email = self.entry_email.get()
-        rec_year_birthday = self.ANO_ATUAL - int(rec_entry_age)
+        rec_year_birthday = self.ACTUAL_YEAR - int(rec_entry_age)
         intercept_gender = f'{self.obtain_gender()}'
+
+        formating_cpf = f"{rec_entry_cpf[0:3]}.{rec_entry_cpf[3:6]}.{rec_entry_cpf[6:9]}-{rec_entry_cpf[9:11]}"
 
         #Enviando as informações obtidas na entrada para o banco de dados.
         SENDING_INFORMATIONS = f'''INSERT INTO db_users.tb_users_registed
         (login_user, password_user, age, country, year_of_birthday, cpf_user, email_user, registed_hour, gender_user, registed_date) 
         VALUE ('{str(rec_entry_login)}', '{str(rec_entry_passw)}', '{int(rec_entry_age)}', '{str(rec_combo_country)}',
-        '{int(rec_year_birthday)}', '{str(rec_entry_cpf)}', '{str(rec_entry_email)}', '{str(CAPTURE_HOUR)}', '{str(intercept_gender)}', '{str(CAPTURE_DATE)}')
+        '{int(rec_year_birthday)}', '{str(formating_cpf)}', '{str(rec_entry_email)}', '{str(CAPTURE_HOUR)}', '{str(intercept_gender)}', '{str(CAPTURE_DATE)}')
         '''
-
         #Confirmando o envio dos dados ao Banco de Dados.
         self.cursor.execute(SENDING_INFORMATIONS)
         self.connected.commit()
+
+    def verify_nickname(self):
+
+        rec_entry_nick = self.entry_login.get()
+        rec_nicks_only = '''SELECT login_user FROM db_users.tb_users_registed'''
+        self.cursor.execute(rec_nicks_only)
+        lines_obtained = self.cursor.fetchall()
+
+        for lines_nicks in lines_obtained:
+
+            if lines_nicks[0] == rec_entry_nick:
+
+                self.label_verify_user()
+                self.label_confirmation_user['text'] = 'USUÁRIO INDISPONÍVEL!'
+                self.label_confirmation_user['fg'] = 'red'
+                return False
+                
+        self.label_verify_user()
+        return True
+             
+    def label_verify_user(self):
+
+        self.label_confirmation_user = Label(self.create_account_window, width=22, height=1, text='USUÁRIO DISPONÍVEL!', fg='green', bg='#faf8f7', font=('Times 8'))
+        self.label_confirmation_user.place(x=255, y=26)
 
 if __name__ == '__main__':
     CreateAccount()

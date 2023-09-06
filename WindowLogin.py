@@ -72,7 +72,7 @@ class LoginUser:
         win.deiconify()
 
     #Configurações da janela de login
-    CAMINHO_ARQUIVO = os.path.dirname(__file__)
+    PATH_FILE = os.path.dirname(__file__)
 
     customtkinter.set_appearance_mode('dark')
     customtkinter.set_default_color_theme('dark-blue')
@@ -81,11 +81,11 @@ class LoginUser:
     main_login_window.title('Painel de Login')
     main_login_window.geometry('450x350')
     main_login_window.config(bg='#faf8f7')
-    main_login_window.iconbitmap(CAMINHO_ARQUIVO + r"./icons/login.ico")
+    main_login_window.iconbitmap(PATH_FILE + r"./icons/login.ico")
     main_login_window.resizable(False, False)   
     
     #Configurações de imagem da tela de login
-    img_user = PhotoImage(file=CAMINHO_ARQUIVO+r"\icons\user.png")
+    img_user = PhotoImage(file=PATH_FILE+r"\icons\user.png")
     label_user = Label(main_login_window, image=img_user, bg='#faf8f7')
     label_user.place(x=190, y=50)
 
