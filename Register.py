@@ -3,12 +3,13 @@ import customtkinter
 from datetime import datetime
 from tkinter import *
 from mysql.connector import connect
-import os
-import re
+import os, re
 from time import sleep
+import smtplib, email.message, random, string
 class CreateAccount:
 
     #Variaveis de flexibilidade
+    CODE_GERATED = ''
     rec_year_actual = datetime.now()
     ACTUAL_YEAR = rec_year_actual.year
     PATH_FILE = os.path.dirname(__file__)
@@ -105,7 +106,13 @@ class CreateAccount:
         self.label_email.place(x=128, y=266)
 
         self.label_gender = Label(self.create_account_window, width=20, height=1, text='Gênero', bg='#faf8f7')
-        self.label_gender.place(x=103, y=320)
+        self.label_gender.place(x=103, y=375)
+
+        self.label_email_verify = Label(self.create_account_window, width=13, height=1, text='Código Recebido', bg='#faf8f7')
+        self.label_email_verify.place(x=153, y=318)
+
+        self.label_email_verify_code = Label(self.create_account_window, width=8, height=1, text='', bg='#faf8f7', font=('Arial 9'))
+        self.label_email_verify_code.place(x=90, y=340)
     
     #Função responsável por receber as informações digitadas pelo usuário.
     def entry_infos(self):
@@ -116,7 +123,7 @@ class CreateAccount:
         self.entry_password = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_password.place(x=155, y=100)
 
-        self.entry_age = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
+        self.entry_age = Entry(self.create_account_window, width=15, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_age.place(x=155, y=150)
 
         self.entry_cpf = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
@@ -125,41 +132,48 @@ class CreateAccount:
         self.entry_email = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
         self.entry_email.place(x=155, y=290)
 
+        self.entry_email_code = Entry(self.create_account_window, width=15, font=('Arial 11'), relief='raised', bg='#faf8f7')
+        self.entry_email_code.place(x=155, y=340)
+
     def button_register(self):
         
         #Criando botão de registro
         button_register = customtkinter.CTkButton(master=self.create_account_window, command=self.recept_informations, width=150, height=30, text='Criar conta', cursor='hand2')
-        button_register.place(x=152, y=400)
+        button_register.place(x=153, y=450)
 
         button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.cpf_validating, width=50, height=25, text='Verificar', cursor='hand2')
         button_valid_cpf.place(x=490, y=238)
 
-        button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_nickname, width=50, height=25, text='Verificar', cursor='hand2')
-        button_valid_cpf.place(x=490, y=49)
+        button_valid_nick = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_nickname, width=50, height=25, text='Verificar', cursor='hand2')
+        button_valid_nick.place(x=490, y=49)
+
+        button_valid_email = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_email, width=50, height=25, text='Confirmar', cursor='hand2')
+        button_valid_email.place(x=285, y=337)
+
+        button_send_email = customtkinter.CTkButton(master=self.create_account_window, command=self.send_email, width=50, height=25, text='Enviar', cursor='hand2')
+        button_send_email.place(x=490, y=288)
 
     #Função responsavél por receber e validar duas funções, função de Label e função de envio de dados ao Banco.
     def recept_informations(self):
 
-        if self.cpf_validating() == True:
-            pass
-            if self.verify_nickname() == True:
-                #Enviando os dados para o banco
-                self.sending_dates()
-                #Timer para ver alterações
-                sleep(1)
-                self.label_confirmation['text'] = ''
-                #Limpando as entradas, para facilitar a criação de uma nova conta.
-                self.entry_login.delete(0, END)
-                self.entry_password.delete(0, END)
-                self.entry_age.delete(0, END)
-                self.combo_country.current(30)
-                self.entry_cpf.delete(0, END)
-                self.entry_email.delete(0, END)
-            elif self.verify_nickname() == False:
-                self.entry_login.delete(0, END)
-
-        else:
+        self.validating_all_dates()
+        
+        if self.counting_steps == 3:
+            #Enviando os dados para o banco
+            self.sending_dates()
+            #Timer para ver alterações
+            sleep(1)
+            self.label_confirmation['text'] = ''
+            #Limpando as entradas, para facilitar a criação de uma nova conta.
+            self.entry_login.delete(0, END)
+            self.entry_password.delete(0, END)
+            self.entry_age.delete(0, END)
+            self.combo_country.current(30)
             self.entry_cpf.delete(0, END)
+            self.entry_email.delete(0, END)
+            self.entry_email_code.delete(0, END)
+        else:
+            pass
 
     def obtain_gender(self):
         rec_gender = self.selection_gender.get()
@@ -170,13 +184,13 @@ class CreateAccount:
         self.selection_gender = StringVar()
 
         gender_male = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', cursor='hand2', variable=self.selection_gender)
-        gender_male.place(x=150, y=350)
+        gender_male.place(x=155, y=400)
 
         gender_female = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', cursor='hand2', variable=self.selection_gender)
-        gender_female.place(x=260, y=350)
+        gender_female.place(x=265, y=400)
 
         gender_others = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', cursor='hand2', variable=self.selection_gender)
-        gender_others.place(x=370, y=350)
+        gender_others.place(x=375, y=400)
 
     def validate_cpf(self, cpf):
         
@@ -284,6 +298,80 @@ class CreateAccount:
 
         self.label_confirmation_user = Label(self.create_account_window, width=22, height=1, text='USUÁRIO DISPONÍVEL!', fg='green', bg='#faf8f7', font=('Times 8'))
         self.label_confirmation_user.place(x=255, y=26)
+
+    def verify_email(self):
+
+        rec_entry_email_code = self.entry_email_code.get()
+
+        if rec_entry_email_code.upper() == self.CODE_GERATED:
+            self.label_email_verify_code['text'] = 'OKAY'
+            self.label_email_verify_code['fg'] = 'green'
+            return True
+        else:
+            self.label_email_verify_code['text'] = 'ERROR'
+            self.label_email_verify_code['fg'] = 'red'
+            return False
+
+    def code_generator(self):
+        
+        count_pass = 3
+        for index in range(count_pass):
+
+            self.code_gerating_letter = random.choice(string.ascii_uppercase)
+            self.code_gerating_number = random.randint(0,9)
+
+            self.CODE_GERATED += self.code_gerating_letter
+            self.CODE_GERATED += str(self.code_gerating_number)
+    
+    def send_email(self):
+
+        self.code_generator()
+
+        rec_entry_email = self.entry_email.get()
+
+        body_email = f"""
+        <h1>Ola! Vamos validar o seu e-mail de Cadastro no Sistema</h1>
+        <p> </p>
+        <h1>{self.CODE_GERATED}</h1>
+        """
+
+        msg = email.message.Message()
+        msg['Subject'] = "Código de Verificação"
+        msg['From'] = 'sistemadecadastropy@gmail.com'
+        msg['To'] = f'{rec_entry_email}'
+        password = 'ninndxersjybahct' 
+        msg.add_header('Content-Type', 'text/html')
+        msg.set_payload(body_email)
+
+        s = smtplib.SMTP('smtp.gmail.com: 587')
+        s.starttls()
+        # Login Credentials for sending the mail
+        s.login(msg['From'], password)
+        s.sendmail(msg['From'], [msg['To']], msg.as_string().encode('utf-8'))
+
+    def validating_all_dates(self):
+
+        self.counting_steps = 0
+
+        #Validando CPF
+        if self.cpf_validating() == True:
+            self.counting_steps += 1
+        else:
+            self.entry_cpf.delete(0, END)
+
+        #Validando NickName
+        if self.verify_nickname() == True:
+            self.counting_steps += 1
+        else:
+            self.entry_login.delete(0, END)
+
+        #Validando o Código enviado para o E-mail
+        if self.verify_email() == True:
+            self.counting_steps += 1
+        else:
+            self.entry_email_code.delete(0, END)
+
+        print(self.counting_steps)
 
 if __name__ == '__main__':
     CreateAccount()
