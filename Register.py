@@ -2,6 +2,7 @@ from tkinter.ttk import *
 import customtkinter
 from datetime import datetime
 from tkinter import *
+from tkinter import messagebox
 from mysql.connector import connect
 import os, re
 from time import sleep
@@ -37,7 +38,7 @@ class CreateAccount(ValidateEntry):
     rec_year_actual = datetime.now()
     ACTUAL_YEAR = rec_year_actual.year
     PATH_FILE = os.path.dirname(__file__)
-
+    
     #Conexão com o Banco de Dados
     try:
         connected = connect(
@@ -78,7 +79,7 @@ class CreateAccount(ValidateEntry):
     #Criando a janela utilizando customtkinter.
     create_account_window = customtkinter.CTk()
     create_account_window.title('Sistema de Cadastro de Usuários')
-    create_account_window.geometry('600x600')
+    create_account_window.geometry('650x600')
     create_account_window.config(bg='#faf8f7')
     create_account_window.iconbitmap(PATH_FILE+r'./icons/login.ico')
     create_account_window.resizable(width=False, height=False)
@@ -186,6 +187,9 @@ class CreateAccount(ValidateEntry):
         if self.counting_steps == 3:
             #Enviando os dados para o banco
             self.sending_dates()
+
+            msg_sucess = f'Cadastro realizado com sucesso\nSeja Bem Vindo! {self.entry_login.get()}'
+            messagebox.showinfo('Mensagem de boas vindas!', msg_sucess)
             #Timer para ver alterações
             sleep(1)
             self.label_confirmation['text'] = ''
@@ -356,9 +360,8 @@ class CreateAccount(ValidateEntry):
         rec_entry_email = self.entry_email.get()
 
         body_email = f"""
-        <h1>Ola! Vamos validar o seu e-mail de Cadastro no Sistema</h1>
-        <p> </p>
-        <h1>{self.CODE_GERATED}</h1>
+        <h1>Seja Bem Vindo(a)! {self.entry_login.get()}<br/> Vamos validar o seu e-mail de Cadastro no Sistema<br/></h1>
+        <h1><br/>CÓDIGO: {self.CODE_GERATED}<br/></h1>
         """
 
         msg = email.message.Message()
