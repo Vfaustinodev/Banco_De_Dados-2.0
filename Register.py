@@ -6,7 +6,31 @@ from mysql.connector import connect
 import os, re
 from time import sleep
 import smtplib, email.message, random, string
-class CreateAccount:
+
+class ValidateEntry:
+
+    def validating_age_entry(self, age):
+
+        if age == '': return True
+
+        try:
+            value = int(age)
+        except ValueError:
+            return False
+        return 0 <= value <= 150
+    
+    def validating_cpf_entry(self, cpf):
+        num = '99999999999'
+        if cpf == '': return True
+
+        try:
+            value = int(cpf)
+            value = str(cpf)
+        except ValueError:
+            return False
+        return len(value) <= len(num)
+
+class CreateAccount(ValidateEntry):
 
     #Variaveis de flexibilidade
     CODE_GERATED = '******'
@@ -31,6 +55,7 @@ class CreateAccount:
     #Função construtora sendo utilizada para alinhamento de funções e chamado de eventos dentro da janela.
     def __init__(self):
 
+        self.validate_entry_age()
         self.create_gender()
         self.button_register()
         self.labels_infos()
@@ -53,7 +78,7 @@ class CreateAccount:
     #Criando a janela utilizando customtkinter.
     create_account_window = customtkinter.CTk()
     create_account_window.title('Sistema de Cadastro de Usuários')
-    create_account_window.geometry('600x550')
+    create_account_window.geometry('600x600')
     create_account_window.config(bg='#faf8f7')
     create_account_window.iconbitmap(PATH_FILE+r'./icons/login.ico')
     create_account_window.resizable(width=False, height=False)
@@ -123,10 +148,10 @@ class CreateAccount:
         self.entry_password = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_password.place(x=155, y=100)
 
-        self.entry_age = Entry(self.create_account_window, width=15, font=('Arial 11'), bg='#faf8f7', relief='raised')
+        self.entry_age = Entry(self.create_account_window, validate='key', validatecommand= self.validate_age, width=15, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_age.place(x=155, y=150)
 
-        self.entry_cpf = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
+        self.entry_cpf = Entry(self.create_account_window, validate='key', validatecommand=self.validated_cpf, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_cpf.place(x=155, y=240)
 
         self.entry_email = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
@@ -150,8 +175,9 @@ class CreateAccount:
         button_valid_email = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_email, width=50, height=25, text='Confirmar', cursor='hand2', bg_color='#faf8f7', corner_radius=20)
         button_valid_email.place(x=285, y=337)
 
-        button_send_email = customtkinter.CTkButton(master=self.create_account_window, command=self.send_email, width=50, height=25, text='Enviar', cursor='hand2', corner_radius=0)
+        button_send_email = customtkinter.CTkButton(master=self.create_account_window, command=self.send_email, width=50, height=25, text='Enviar', cursor='hand2', corner_radius=20, bg_color='#faf8f7')
         button_send_email.place(x=490, y=288)
+
     #Função responsavél por receber e validar duas funções, função de Label e função de envio de dados ao Banco.
     def recept_informations(self):
 
@@ -303,11 +329,11 @@ class CreateAccount:
         rec_entry_email_code = self.entry_email_code.get()
 
         if rec_entry_email_code.upper() == self.CODE_GERATED:
-            self.label_email_verify_code['text'] = 'OKAY'
+            self.label_email_verify_code['text'] = 'OKAY!'
             self.label_email_verify_code['fg'] = 'green'
             return True
         else:
-            self.label_email_verify_code['text'] = 'ERROR'
+            self.label_email_verify_code['text'] = 'ERROR!'
             self.label_email_verify_code['fg'] = 'red'
             return False
 
@@ -373,5 +399,9 @@ class CreateAccount:
 
         print(self.counting_steps)
 
+    def validate_entry_age(self):
+        self.validate_age = (self.create_account_window.register(self.validating_age_entry), '%P')
+        self.validated_cpf = (self.create_account_window.register(self.validating_cpf_entry), '%P')
+    
 if __name__ == '__main__':
     CreateAccount()
