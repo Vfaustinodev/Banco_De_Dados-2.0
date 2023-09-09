@@ -9,7 +9,7 @@ import smtplib, email.message, random, string
 class CreateAccount:
 
     #Variaveis de flexibilidade
-    CODE_GERATED = ''
+    CODE_GERATED = '******'
     rec_year_actual = datetime.now()
     ACTUAL_YEAR = rec_year_actual.year
     PATH_FILE = os.path.dirname(__file__)
@@ -138,21 +138,20 @@ class CreateAccount:
     def button_register(self):
         
         #Criando botão de registro
-        button_register = customtkinter.CTkButton(master=self.create_account_window, command=self.recept_informations, width=150, height=30, text='Criar conta', cursor='hand2')
+        button_register = customtkinter.CTkButton(master=self.create_account_window, command=self.recept_informations, width=150, height=30, text='Criar conta', cursor='hand2', corner_radius=0)
         button_register.place(x=153, y=450)
 
-        button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.cpf_validating, width=50, height=25, text='Verificar', cursor='hand2')
+        button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.cpf_validating, width=50, height=25, text='Verificar', cursor='hand2', corner_radius=0)
         button_valid_cpf.place(x=490, y=238)
 
-        button_valid_nick = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_nickname, width=50, height=25, text='Verificar', cursor='hand2')
+        button_valid_nick = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_nickname, width=50, height=25, text='Verificar', cursor='hand2', corner_radius=0)
         button_valid_nick.place(x=490, y=49)
 
-        button_valid_email = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_email, width=50, height=25, text='Confirmar', cursor='hand2')
+        button_valid_email = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_email, width=50, height=25, text='Confirmar', cursor='hand2', bg_color='#faf8f7', corner_radius=20)
         button_valid_email.place(x=285, y=337)
 
-        button_send_email = customtkinter.CTkButton(master=self.create_account_window, command=self.send_email, width=50, height=25, text='Enviar', cursor='hand2')
+        button_send_email = customtkinter.CTkButton(master=self.create_account_window, command=self.send_email, width=50, height=25, text='Enviar', cursor='hand2', corner_radius=0)
         button_send_email.place(x=490, y=288)
-
     #Função responsavél por receber e validar duas funções, função de Label e função de envio de dados ao Banco.
     def recept_informations(self):
 
@@ -183,13 +182,13 @@ class CreateAccount:
 
         self.selection_gender = StringVar()
 
-        gender_male = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', cursor='hand2', variable=self.selection_gender)
+        gender_male = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', cursor='hand2', variable=self.selection_gender, border_width_checked=6, border_width_unchecked=4, bg_color='#faf8f7', text_color='#000000', border_color='#000000', corner_radius=6, hover_color='#f54316', radiobutton_width=22, radiobutton_height=20)
         gender_male.place(x=155, y=400)
 
-        gender_female = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', cursor='hand2', variable=self.selection_gender)
+        gender_female = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', cursor='hand2', variable=self.selection_gender, border_width_checked=6, border_width_unchecked=4, bg_color='#faf8f7', text_color='#000000', border_color='#000000', corner_radius=6, hover_color='#f54316', radiobutton_width=22, radiobutton_height=20)
         gender_female.place(x=265, y=400)
 
-        gender_others = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', cursor='hand2', variable=self.selection_gender)
+        gender_others = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', cursor='hand2', variable=self.selection_gender, border_width_checked=6, border_width_unchecked=4, bg_color='#faf8f7', text_color='#000000', border_color='#000000', corner_radius=6, hover_color='#f54316', radiobutton_width=22, radiobutton_height=20)
         gender_others.place(x=375, y=400)
 
     def validate_cpf(self, cpf):
@@ -300,7 +299,7 @@ class CreateAccount:
         self.label_confirmation_user.place(x=255, y=26)
 
     def verify_email(self):
-
+        
         rec_entry_email_code = self.entry_email_code.get()
 
         if rec_entry_email_code.upper() == self.CODE_GERATED:
@@ -314,6 +313,7 @@ class CreateAccount:
 
     def code_generator(self):
         
+        self.CODE_GERATED = ''
         count_pass = 3
         for index in range(count_pass):
 
