@@ -11,14 +11,15 @@ import smtplib, email.message, random, string
 class ValidateEntry:
 
     def validating_age_entry(self, age):
-
+        num_age = '150'
         if age == '': return True
 
         try:
             value = int(age)
+            value = str(age)
         except ValueError:
             return False
-        return 0 <= value <= 150
+        return len(value) <= len(num_age) and int(value) <= 150
     
     def validating_cpf_entry(self, cpf):
         num = '99999999999'
