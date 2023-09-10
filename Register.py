@@ -133,21 +133,27 @@ class CreateAccount(ValidateEntry):
         self.label_email.place(x=128, y=266)
 
         self.label_gender = Label(self.create_account_window, width=20, height=1, text='Gênero', bg='#faf8f7')
-        self.label_gender.place(x=103, y=375)
+        self.label_gender.place(x=103, y=465)
 
         self.label_email_verify = Label(self.create_account_window, width=13, height=1, text='Código Recebido', bg='#faf8f7')
         self.label_email_verify.place(x=153, y=318)
 
         self.label_email_verify_code = Label(self.create_account_window, width=8, height=1, text='', bg='#faf8f7', font=('Arial 9'))
         self.label_email_verify_code.place(x=90, y=340)
-    
+
+        self.label_name = Label(self.create_account_window, width=12, height=1, text='Nome completo', bg='#faf8f7', font=('Arial 9'))
+        self.label_name.place(x=156, y=365)
+
+        self.label_phone_number = Label(self.create_account_window, width=15, height=1, text='Número de telefone', bg='#faf8f7', font=('Arial 9'))
+        self.label_phone_number.place(x=156, y=415)
+
     #Função responsável por receber as informações digitadas pelo usuário.
     def entry_infos(self):
         
         self.entry_login = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_login.place(x=155, y=50)
 
-        self.entry_password = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
+        self.entry_password = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised', show='*')
         self.entry_password.place(x=155, y=100)
 
         self.entry_age = Entry(self.create_account_window, validate='key', validatecommand= self.validate_age, width=15, font=('Arial 11'), bg='#faf8f7', relief='raised')
@@ -162,11 +168,17 @@ class CreateAccount(ValidateEntry):
         self.entry_email_code = Entry(self.create_account_window, width=15, font=('Arial 11'), relief='raised', bg='#faf8f7')
         self.entry_email_code.place(x=155, y=340)
 
+        self.entry_name = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
+        self.entry_name.place(x=155, y=390)
+
+        self.entry_phone_number = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
+        self.entry_phone_number.place(x=155, y=440)
+
     def button_register(self):
         
         #Criando botão de registro
         button_register = customtkinter.CTkButton(master=self.create_account_window, command=self.recept_informations, width=150, height=30, text='Criar conta', cursor='hand2', corner_radius=0)
-        button_register.place(x=153, y=450)
+        button_register.place(x=153, y=530)
 
         button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.cpf_validating, width=50, height=25, text='Verificar', cursor='hand2', corner_radius=0)
         button_valid_cpf.place(x=490, y=238)
@@ -202,6 +214,9 @@ class CreateAccount(ValidateEntry):
             self.entry_cpf.delete(0, END)
             self.entry_email.delete(0, END)
             self.entry_email_code.delete(0, END)
+            self.entry_name.delete(0, END)
+            self.entry_phone_number.delete(0, END)
+            self.label_email_verify_code['text'] = ''
         else:
             pass
 
@@ -214,13 +229,13 @@ class CreateAccount(ValidateEntry):
         self.selection_gender = StringVar()
 
         gender_male = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Masculino', value='Masculino', cursor='hand2', variable=self.selection_gender, border_width_checked=6, border_width_unchecked=4, bg_color='#faf8f7', text_color='#000000', border_color='#000000', corner_radius=6, hover_color='#f54316', radiobutton_width=22, radiobutton_height=20)
-        gender_male.place(x=155, y=400)
+        gender_male.place(x=155, y=490)
 
         gender_female = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Feminino', value='Feminino', cursor='hand2', variable=self.selection_gender, border_width_checked=6, border_width_unchecked=4, bg_color='#faf8f7', text_color='#000000', border_color='#000000', corner_radius=6, hover_color='#f54316', radiobutton_width=22, radiobutton_height=20)
-        gender_female.place(x=265, y=400)
+        gender_female.place(x=265, y=490)
 
         gender_others = customtkinter.CTkRadioButton(self.create_account_window, command=self.obtain_gender, text='Outros', value='Outros', cursor='hand2', variable=self.selection_gender, border_width_checked=6, border_width_unchecked=4, bg_color='#faf8f7', text_color='#000000', border_color='#000000', corner_radius=6, hover_color='#f54316', radiobutton_width=22, radiobutton_height=20)
-        gender_others.place(x=375, y=400)
+        gender_others.place(x=375, y=490)
 
     def validate_cpf(self, cpf):
         
@@ -297,8 +312,8 @@ class CreateAccount(ValidateEntry):
 
         #Enviando as informações obtidas na entrada para o banco de dados.
         SENDING_INFORMATIONS = f'''INSERT INTO db_users.tb_users_registed
-        (login_user, password_user, age, country, year_of_birthday, cpf_user, email_user, registed_hour, gender_user, registed_date) 
-        VALUE ('{str(rec_entry_login)}', '{str(rec_entry_passw)}', '{int(rec_entry_age)}', '{str(rec_combo_country)}',
+        (name_registed, phone_number, login_user, password_user, age, country, year_of_birthday, cpf_user, email_user, registed_hour, gender_user, registed_date) 
+        VALUE ('{self.entry_name.get()}', '{self.entry_phone_number.get()}', '{str(rec_entry_login)}', '{str(rec_entry_passw)}', '{int(rec_entry_age)}', '{str(rec_combo_country)}',
         '{int(rec_year_birthday)}', '{str(formating_cpf)}', '{str(rec_entry_email)}', '{str(CAPTURE_HOUR)}', '{str(intercept_gender)}', '{str(CAPTURE_DATE)}')
         '''
         #Confirmando o envio dos dados ao Banco de Dados.
@@ -361,8 +376,8 @@ class CreateAccount(ValidateEntry):
         rec_entry_email = self.entry_email.get()
 
         body_email = f"""
-        <h1>Seja Bem Vindo(a)! {self.entry_login.get()}<br/> Vamos validar o seu e-mail de Cadastro no Sistema<br/></h1>
-        <h1><br/>CÓDIGO: {self.CODE_GERATED}<br/></h1>
+        <h1>Ola! {self.entry_login.get()}<br/><br/> Vamos validar o seu e-mail de Cadastro no Sistema<br/></h1>
+        <h1><br/>CODIGO: {self.CODE_GERATED}<br/></h1>
         """
 
         msg = email.message.Message()
