@@ -6,8 +6,10 @@ from time import sleep
 # Criando a janela de login
 class LoginUser():
         
+    PATH_FILE = os.path.dirname(__file__)
+
     try:
-        connect = sqlite3.connect('./Banco_De_Dados-2.0/users_registed.db')
+        connect = sqlite3.connect(PATH_FILE+'/users_registed.db')
         cursor = connect.cursor()
 
     except:
@@ -72,11 +74,11 @@ class LoginUser():
     main_login_window.title('Painel de Login')
     main_login_window.geometry('450x350')
     main_login_window.config(bg='#faf8f7')
-    main_login_window.iconbitmap(PATH_FILE + r"./icons/login.ico")
+    main_login_window.iconbitmap(PATH_FILE+"/icons/login.ico")
     main_login_window.resizable(False, False)   
     
     #Configurações de imagem da tela de login
-    img_user = PhotoImage(file=PATH_FILE+r"\icons\user.png")
+    img_user = PhotoImage(file=PATH_FILE+"/icons/user.png")
     label_user = Label(main_login_window, image=img_user, bg='#faf8f7')
     label_user.place(x=190, y=50)
 

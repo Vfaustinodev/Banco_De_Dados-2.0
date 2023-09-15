@@ -54,7 +54,7 @@ class CreateAccount(ValidateEntry):
     
     #Conexão com o Banco de Dados
     try:
-        connected = sqlite3.connect('./Banco_De_Dados-2.0/users_registed.db')
+        connected = sqlite3.connect(PATH_FILE+'/users_registed.db')
         cursor = connected.cursor()
 
     except:
@@ -88,7 +88,7 @@ class CreateAccount(ValidateEntry):
     create_account_window.title('Sistema de Cadastro de Usuários')
     create_account_window.geometry('650x600')
     create_account_window.config(bg='#faf8f7')
-    create_account_window.iconbitmap(PATH_FILE+r'./icons/login.ico')
+    create_account_window.iconbitmap(PATH_FILE+'/icons/login.ico')
     create_account_window.resizable(width=False, height=False)
 
     # Adicionando os paises ao Combobox
