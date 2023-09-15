@@ -1,4 +1,5 @@
 import customtkinter
+import keyboard
 from tkinter import *
 import os, sqlite3
 from time import sleep
@@ -23,7 +24,7 @@ class LoginUser():
         self.main_login_window.mainloop()
         
     #Capturando as informações de entrada do usuário
-    def passw_getter(self):
+    def passw_getter(self, event):
         
         passw_get = self.entry_passw_info.get()
         login_get = self.entry_user_info.get()
@@ -40,7 +41,6 @@ class LoginUser():
                 break
             else:
                 ...
-
 
     def alert_login(self):
         sucess_login = Label(self.main_login_window, text='Login Efetuado Com Sucesso...', bg='#faf8f7')
@@ -114,6 +114,8 @@ class LoginUser():
         #Criando Botão de entrada de dados do usuário para o sistema
         send_button = Button(self.main_login_window, command=self.passw_getter, width=34, height=2, text='Entrar', font=('Arial 10'), overrelief='groove', bg='blue', fg='white')
         send_button.place(x=91.5, y=260)
+        self.entry_passw_info.bind('<Return>', self.passw_getter)
+
 
 if __name__ == '__main__':
     LoginUser()
