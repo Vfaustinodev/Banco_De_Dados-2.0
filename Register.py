@@ -54,7 +54,7 @@ class CreateAccount(ValidateEntry):
     
     #Conexão com o Banco de Dados
     try:
-        connected = sqlite3.connect('users_registed.db')
+        connected = sqlite3.connect('./Banco_De_Dados-2.0/users_registed.db')
         cursor = connected.cursor()
 
     except:

@@ -7,7 +7,7 @@ from time import sleep
 class LoginUser():
         
     try:
-        connect = sqlite3.connect('users_registed.db')
+        connect = sqlite3.connect('./Banco_De_Dados-2.0/users_registed.db')
         cursor = connect.cursor()
 
     except:
