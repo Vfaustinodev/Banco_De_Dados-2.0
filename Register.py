@@ -3,7 +3,7 @@ import customtkinter
 from datetime import datetime
 from tkinter import *
 from tkinter import messagebox
-from mysql.connector import connect
+import sqlite3
 import os, re
 from time import sleep
 import smtplib, email.message, random, string
@@ -22,7 +22,7 @@ class ValidateEntry:
         return len(value) <= len(num_age) and int(value) <= 150
     
     def validating_cpf_entry(self, cpf):
-        num = '99999999999'
+        num = '9' * 11
         if cpf == '': return True
 
         try:
@@ -30,6 +30,18 @@ class ValidateEntry:
             value = str(cpf)
         except ValueError:
             return False
+        
+        return len(value) <= len(num)
+    
+    def limited_name_entry(self, name):
+        num = '9' * 60
+        if name == '': return True
+
+        try:
+            value = str(name)
+        except ValueError:
+            return False
+        
         return len(value) <= len(num)
 
 class CreateAccount(ValidateEntry):
@@ -42,15 +54,9 @@ class CreateAccount(ValidateEntry):
     
     #Conexão com o Banco de Dados
     try:
-        connected = connect(
-            host='localhost',
-            database='db_users',
-            user='root',
-            password='root'
-        )
+        connected = sqlite3.connect('users_registed.db')
+        cursor = connected.cursor()
 
-        if connected.is_connected():
-            cursor = connected.cursor()
     except:
         exit()
 
@@ -168,7 +174,7 @@ class CreateAccount(ValidateEntry):
         self.entry_email_code = Entry(self.create_account_window, width=15, font=('Arial 11'), relief='raised', bg='#faf8f7')
         self.entry_email_code.place(x=155, y=340)
 
-        self.entry_name = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
+        self.entry_name = Entry(self.create_account_window, validate='key', validatecommand=self.validated_name, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
         self.entry_name.place(x=155, y=390)
 
         self.entry_phone_number = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
@@ -311,19 +317,18 @@ class CreateAccount(ValidateEntry):
         formating_cpf = f"{rec_entry_cpf[0:3]}.{rec_entry_cpf[3:6]}.{rec_entry_cpf[6:9]}-{rec_entry_cpf[9:11]}"
 
         #Enviando as informações obtidas na entrada para o banco de dados.
-        SENDING_INFORMATIONS = f'''INSERT INTO db_users.tb_users_registed
+        self.cursor.execute(f'''INSERT INTO tb_users_registed
         (name_registed, phone_number, login_user, password_user, age, country, year_of_birthday, cpf_user, email_user, registed_hour, gender_user, registed_date) 
-        VALUE ('{self.entry_name.get()}', '{self.entry_phone_number.get()}', '{str(rec_entry_login)}', '{str(rec_entry_passw)}', '{int(rec_entry_age)}', '{str(rec_combo_country)}',
+        VALUES ('{self.entry_name.get()}', '{self.entry_phone_number.get()}', '{str(rec_entry_login)}', '{str(rec_entry_passw)}', '{int(rec_entry_age)}', '{str(rec_combo_country)}',
         '{int(rec_year_birthday)}', '{str(formating_cpf)}', '{str(rec_entry_email)}', '{str(CAPTURE_HOUR)}', '{str(intercept_gender)}', '{str(CAPTURE_DATE)}')
-        '''
+        ''')
         #Confirmando o envio dos dados ao Banco de Dados.
-        self.cursor.execute(SENDING_INFORMATIONS)
         self.connected.commit()
 
     def verify_nickname(self):
 
         rec_entry_nick = self.entry_login.get()
-        rec_nicks_only = '''SELECT login_user FROM db_users.tb_users_registed'''
+        rec_nicks_only = '''SELECT login_user FROM tb_users_registed'''
         self.cursor.execute(rec_nicks_only)
         lines_obtained = self.cursor.fetchall()
 
@@ -419,8 +424,10 @@ class CreateAccount(ValidateEntry):
         print(self.counting_steps)
 
     def validate_entry_age(self):
+        
         self.validate_age = (self.create_account_window.register(self.validating_age_entry), '%P')
         self.validated_cpf = (self.create_account_window.register(self.validating_cpf_entry), '%P')
+        self.validated_name = (self.create_account_window.register(self.limited_name_entry), '%P')
     
 if __name__ == '__main__':
     CreateAccount()

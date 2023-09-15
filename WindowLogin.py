@@ -1,22 +1,14 @@
 import customtkinter
 from tkinter import *
-import os
-from mysql import connector
+import os, sqlite3
 from time import sleep
 
 # Criando a janela de login
-class LoginUser:
+class LoginUser():
         
     try:
-        connect = connector.connect(
-            host='localhost',
-            database='db_users',
-            user='root',
-            password='root'
-        )
-
-        if connect.is_connected():
-            cursor = connect.cursor()
+        connect = sqlite3.connect('users_registed.db')
+        cursor = connect.cursor()
 
     except:
         print('NÃO FOI FEITA A CONEXÃO COM O BANCO DE DADOS')
@@ -34,8 +26,7 @@ class LoginUser:
         passw_get = self.entry_passw_info.get()
         login_get = self.entry_user_info.get()
 
-        get_users_registed = f'''SELECT login_user, password_user FROM db_users.tb_users_registed'''
-        self.cursor.execute(get_users_registed)
+        self.cursor.execute(f'''SELECT login_user, password_user FROM tb_users_registed''')
         results_users = self.cursor.fetchall()
         
         for lines_get in results_users:
@@ -105,6 +96,7 @@ class LoginUser:
 
     #Indo para janela de cadastro
     def window_register(self):
+        
         self.main_login_window.destroy()
         from Register import CreateAccount
         CreateAccount()
