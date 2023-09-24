@@ -153,14 +153,20 @@ class CreateAccount(ValidateEntry):
         self.label_phone_number = Label(self.create_account_window, width=15, height=1, text='Número de telefone', bg='#faf8f7', font=('Arial 9'))
         self.label_phone_number.place(x=156, y=415)
 
+        self.label_passw_confirm = Label(self.create_account_window, width=15, height=1, text='', bg='#faf8f7', font=('Arial 9'))
+        self.label_passw_confirm.place(x=240, y=75)
+
     #Função responsável por receber as informações digitadas pelo usuário.
     def entry_infos(self):
         
         self.entry_login = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_login.place(x=155, y=50)
 
-        self.entry_password = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised', show='*')
+        text_password = StringVar()
+        text_password.trace("w", lambda name, index, mode, text_password=text_password: self.callback_pass(text_password))
+        self.entry_password = Entry(self.create_account_window, textvariable=text_password, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised', show='*')
         self.entry_password.place(x=155, y=100)
+        #text_password.trace("w", lambda name, index, mode, text_password=self.pass_entry: self.callback(text_password))
 
         self.entry_age = Entry(self.create_account_window, validate='key', validatecommand= self.validate_age, width=15, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_age.place(x=155, y=150)
@@ -180,6 +186,10 @@ class CreateAccount(ValidateEntry):
         self.entry_phone_number = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
         self.entry_phone_number.place(x=155, y=440)
 
+    def show_pass(self):
+
+        self.entry_password['show'] = ''
+        
     def button_register(self):
         
         #Criando botão de registro
@@ -198,12 +208,15 @@ class CreateAccount(ValidateEntry):
         button_send_email = customtkinter.CTkButton(master=self.create_account_window, command=self.send_email, width=50, height=25, text='Enviar', cursor='hand2', corner_radius=20, bg_color='#faf8f7')
         button_send_email.place(x=490, y=288)
 
+        button_show_pass = customtkinter.CTkButton(master=self.create_account_window, command=self.show_pass, width=50, height=25, text='Mostrar', cursor='hand2', corner_radius=20, bg_color='#faf8f7')
+        button_show_pass.place(x=490, y=100)
+
     #Função responsavél por receber e validar duas funções, função de Label e função de envio de dados ao Banco.
     def recept_informations(self):
 
         self.validating_all_dates()
         
-        if self.counting_steps == 3:
+        if self.counting_steps == 4:
             #Enviando os dados para o banco
             self.sending_dates()
 
@@ -223,6 +236,8 @@ class CreateAccount(ValidateEntry):
             self.entry_name.delete(0, END)
             self.entry_phone_number.delete(0, END)
             self.label_email_verify_code['text'] = ''
+            self.label_passw_confirm['text'] = ''
+            self.label_confirmation_user['text'] = ''
         else:
             pass
 
@@ -420,14 +435,33 @@ class CreateAccount(ValidateEntry):
             self.counting_steps += 1
         else:
             self.entry_email_code.delete(0, END)
-
-        print(self.counting_steps)
+        
+        #Validando o Código enviado para o E-mail
+        if self.password_response == True:
+            self.counting_steps += 1
+        else:
+            self.entry_password.delete(0, END)
 
     def validate_entry_age(self):
         
         self.validate_age = (self.create_account_window.register(self.validating_age_entry), '%P')
         self.validated_cpf = (self.create_account_window.register(self.validating_cpf_entry), '%P')
         self.validated_name = (self.create_account_window.register(self.limited_name_entry), '%P')
+    
+    #Função responsável por validar a senha em tempo real
+    def callback_pass(self, pass_entry):
+
+        self.pass_entry = pass_entry
+        validation_of_pass = re.compile(r'^(((?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%<^&*?])[a-zA-Z0-9!@#$%<^&*?]{8,})|([a-zA-Z]+([- .,_][a-zA-Z]+){4,}))$')
+        
+        if validation_of_pass.match(self.pass_entry.get()):
+            self.label_passw_confirm['text'] = 'SENHA FORTE!'
+            self.label_passw_confirm['fg'] = 'green'
+            self.password_response = True
+        else:
+            self.label_passw_confirm['text'] = 'SENHA FRACA'
+            self.label_passw_confirm['fg'] = 'red'
+            self.password_response = False
     
 if __name__ == '__main__':
     CreateAccount()
