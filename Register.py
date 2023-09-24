@@ -459,7 +459,7 @@ class CreateAccount(ValidateEntry):
             self.label_passw_confirm['fg'] = 'green'
             self.password_response = True
         else:
-            self.label_passw_confirm['text'] = 'SENHA FRACA'
+            self.label_passw_confirm['text'] = 'SENHA FRACA!'
             self.label_passw_confirm['fg'] = 'red'
             self.password_response = False
     
