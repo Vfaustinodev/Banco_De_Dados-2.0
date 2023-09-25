@@ -349,7 +349,7 @@ class CreateAccount(ValidateEntry):
 
         for lines_nicks in lines_obtained:
 
-            if lines_nicks[0] == rec_entry_nick:
+            if lines_nicks[0] == rec_entry_nick or rec_entry_nick == '':
 
                 self.label_verify_user()
                 self.label_confirmation_user['text'] = 'USUÁRIO INDISPONÍVEL!'

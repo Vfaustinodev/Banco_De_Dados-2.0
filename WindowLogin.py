@@ -1,11 +1,12 @@
+from tkinter import *
 import customtkinter
 import keyboard
-from tkinter import *
 import os, sqlite3
 from time import sleep
+from PIL import ImageTk, Image
 
 # Criando a janela de login
-class LoginUser():
+class LoginUser:
         
     PATH_FILE = os.path.dirname(__file__)
 
@@ -18,13 +19,14 @@ class LoginUser():
         exit()
 
     def __init__(self):
+        
         self.center(self.main_login_window)
         self.register_user()
         self.button_get_infos()
         self.main_login_window.mainloop()
         
     #Capturando as informações de entrada do usuário
-    def passw_getter(self, event):
+    def passw_getter(self, event=None):
         
         passw_get = self.entry_passw_info.get()
         login_get = self.entry_user_info.get()
@@ -34,17 +36,12 @@ class LoginUser():
         
         for lines_get in results_users:
             if (lines_get[0], lines_get[1]) == (login_get, passw_get):
-                self.alert_login()
                 sleep(1)
                 self.entry_passw_info.delete(0, END)
                 self.entry_user_info.delete(0, END)
                 break
             else:
                 ...
-
-    def alert_login(self):
-        sucess_login = Label(self.main_login_window, text='Login Efetuado Com Sucesso...', bg='#faf8f7')
-        sucess_login.place(x=150, y=28)
 
     def center(self, win):
         win.update_idletasks()
@@ -67,38 +64,35 @@ class LoginUser():
     #Configurações da janela de login
     PATH_FILE = os.path.dirname(__file__)
 
-    customtkinter.set_appearance_mode('dark')
-    customtkinter.set_default_color_theme('dark-blue')
+    customtkinter.set_appearance_mode('system')
+    customtkinter.set_default_color_theme('green')
 
     main_login_window = customtkinter.CTk()
     main_login_window.title('Painel de Login')
-    main_login_window.geometry('450x350')
-    main_login_window.config(bg='#faf8f7')
+    main_login_window.geometry('600x440')
     main_login_window.iconbitmap(PATH_FILE+"/icons/login.ico")
-    main_login_window.resizable(False, False)   
-    
-    #Configurações de imagem da tela de login
-    img_user = PhotoImage(file=PATH_FILE+"/icons/user.png")
-    label_user = Label(main_login_window, image=img_user, bg='#faf8f7')
-    label_user.place(x=190, y=50)
+    main_login_window.eval('tk::PlaceWindow . center')
 
-    #Criando os Labels de Texto
-    login_user = Label(main_login_window, width=10, height=1, text='Login', font=('Arial 8 bold'), fg='black', bg='#faf8f7')
-    login_user.place(x=70, y=125)
+    image_back= ImageTk.PhotoImage(Image.open(PATH_FILE+"./icons/background.jpg"))
+    back_custom = customtkinter.CTkLabel(master=main_login_window, image=image_back, bg_color='black')
+    back_custom.pack()
 
-    login_passw = Label(main_login_window, width=10, height=1, text='Senha', font=('Arial 8 bold'), fg='black', bg='#faf8f7')
-    login_passw.place(x=70, y=180)
+    frame=customtkinter.CTkFrame(master=back_custom, width=380, height=320, corner_radius=15, bg_color='black')
+    frame.place(relx=0.5, rely=0.5, anchor=customtkinter.CENTER)
+
+    label_welcome = customtkinter.CTkLabel(master=frame, text='Seja Bem Vindo(a)', font=('Century Gotic', 20))
+    label_welcome.place(x=112, y=50)
 
     #Criando as entradas de informação do usuário
-    entry_user_info = Entry(main_login_window, width=35, font=('Arial 11'), bg='gray', fg='white')
-    entry_user_info.place(x=90, y=150)
+    entry_user_info = customtkinter.CTkEntry(master=frame, width=250, border_color='#82817e', placeholder_text='Usuário')
+    entry_user_info.place(x=70, y=120)
 
-    entry_passw_info = Entry(main_login_window, width=35, font=('Arial 11'), bg='gray', fg='white', show='*')
-    entry_passw_info.place(x=90, y=204)
+    entry_passw_info = customtkinter.CTkEntry(master=frame, width=250, border_color='#82817e', show='*', placeholder_text='Senha')
+    entry_passw_info.place(x=70, y=170)
 
     #Indo para janela de cadastro
     def window_register(self):
-        
+       
         self.main_login_window.destroy()
         from Register import CreateAccount
         CreateAccount()
@@ -106,16 +100,15 @@ class LoginUser():
     #Botão para se cadastrar
     def register_user(self):
 
-        register_account = Button(command=self.window_register, width=10, height=1, text='Criar conta', font=('Arial 10'), bg='#faf8f7', fg='black', relief='flat', cursor='hand2')
-        register_account.place(x=294, y=226)
+        register_account = customtkinter.CTkButton(master=self.frame, command=self.window_register, width=10, height=1, font=('Century Gotic', 12), text='Criar conta', fg_color='transparent', hover_color='gray')
+        register_account.place(x=255, y=209)
 
     #Chamando a o Button para inicialização
     def button_get_infos(self):
         #Criando Botão de entrada de dados do usuário para o sistema
-        send_button = Button(self.main_login_window, command=self.passw_getter, width=34, height=2, text='Entrar', font=('Arial 10'), overrelief='groove', bg='blue', fg='white')
-        send_button.place(x=91.5, y=260)
+        send_button = customtkinter.CTkButton(master=self.frame, command=self.passw_getter, width=200, height=38, font=('Arial', 15), corner_radius=7, text='Login')
+        send_button.place(x=91.5, y=240)
         self.entry_passw_info.bind('<Return>', self.passw_getter)
-
 
 if __name__ == '__main__':
     LoginUser()
