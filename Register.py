@@ -190,6 +190,7 @@ class CreateAccount(ValidateEntry):
 
         self.entry_password['show'] = ''
         
+
     def button_register(self):
         
         #Criando botão de registro
@@ -202,14 +203,14 @@ class CreateAccount(ValidateEntry):
         button_valid_nick = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_nickname, width=50, height=25, text='Verificar', cursor='hand2', corner_radius=0)
         button_valid_nick.place(x=490, y=49)
 
-        button_valid_email = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_email, width=50, height=25, text='Confirmar', cursor='hand2', bg_color='#faf8f7', corner_radius=20)
-        button_valid_email.place(x=285, y=337)
-
         button_send_email = customtkinter.CTkButton(master=self.create_account_window, command=self.send_email, width=50, height=25, text='Enviar', cursor='hand2', corner_radius=20, bg_color='#faf8f7')
         button_send_email.place(x=490, y=288)
 
         button_show_pass = customtkinter.CTkButton(master=self.create_account_window, command=self.show_pass, width=50, height=25, text='Mostrar', cursor='hand2', corner_radius=20, bg_color='#faf8f7')
         button_show_pass.place(x=490, y=100)
+
+        button_valid_email = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_email, width=50, height=25, text='Confirmar', cursor='hand2', bg_color='#faf8f7', corner_radius=20)
+        button_valid_email.place(x=285, y=337)
 
     #Função responsavél por receber e validar duas funções, função de Label e função de envio de dados ao Banco.
     def recept_informations(self):
@@ -447,7 +448,7 @@ class CreateAccount(ValidateEntry):
         self.validate_age = (self.create_account_window.register(self.validating_age_entry), '%P')
         self.validated_cpf = (self.create_account_window.register(self.validating_cpf_entry), '%P')
         self.validated_name = (self.create_account_window.register(self.limited_name_entry), '%P')
-    
+
     #Função responsável por validar a senha em tempo real
     def callback_pass(self, pass_entry):
 
