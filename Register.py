@@ -7,6 +7,7 @@ import sqlite3
 import os, re
 from time import sleep
 import smtplib, email.message, random, string
+from PIL import ImageTk, Image
 
 class ValidateEntry:
 
@@ -88,7 +89,7 @@ class CreateAccount(ValidateEntry):
     create_account_window.title('Sistema de Cadastro de Usuários')
     create_account_window.geometry('650x600')
     create_account_window.config(bg='#faf8f7')
-    create_account_window.iconbitmap(PATH_FILE+'/icons/login.ico')
+    create_account_window.iconbitmap(PATH_FILE+'/icons/register.ico')
     create_account_window.resizable(width=False, height=False)
 
     # Adicionando os paises ao Combobox
@@ -189,7 +190,6 @@ class CreateAccount(ValidateEntry):
     def show_pass(self):
 
         self.entry_password['show'] = ''
-        
 
     def button_register(self):
         
@@ -239,6 +239,7 @@ class CreateAccount(ValidateEntry):
             self.label_email_verify_code['text'] = ''
             self.label_passw_confirm['text'] = ''
             self.label_confirmation_user['text'] = ''
+            
         else:
             pass
 
@@ -463,6 +464,6 @@ class CreateAccount(ValidateEntry):
             self.label_passw_confirm['text'] = 'SENHA FRACA!'
             self.label_passw_confirm['fg'] = 'red'
             self.password_response = False
-    
+
 if __name__ == '__main__':
     CreateAccount()
