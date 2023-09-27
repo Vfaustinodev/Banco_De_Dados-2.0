@@ -4,7 +4,6 @@ import keyboard
 import os, sqlite3
 from time import sleep
 from PIL import ImageTk, Image
-from Register import CreateAccount
 
 # Criando a janela de login
 class LoginUser:
@@ -94,6 +93,7 @@ class LoginUser:
     #Indo para janela de cadastro
     def window_register(self):
         
+        from Register import CreateAccount
         CreateAccount()
 
     #Botão para se cadastrar
