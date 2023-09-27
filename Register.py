@@ -8,6 +8,7 @@ import os, re
 from time import sleep
 import smtplib, email.message, random, string
 from PIL import ImageTk, Image
+from subprocess import call
 
 class ValidateEntry:
 
@@ -223,22 +224,22 @@ class CreateAccount(ValidateEntry):
 
             msg_sucess = f'Cadastro realizado com sucesso\nSeja Bem Vindo! {self.entry_login.get()}'
             messagebox.showinfo('Mensagem de boas vindas!', msg_sucess)
-            #Timer para ver alterações
-            sleep(1)
-            self.label_confirmation['text'] = ''
-            #Limpando as entradas, para facilitar a criação de uma nova conta.
-            self.entry_login.delete(0, END)
-            self.entry_password.delete(0, END)
-            self.entry_age.delete(0, END)
-            self.combo_country.current(30)
-            self.entry_cpf.delete(0, END)
-            self.entry_email.delete(0, END)
-            self.entry_email_code.delete(0, END)
-            self.entry_name.delete(0, END)
-            self.entry_phone_number.delete(0, END)
-            self.label_email_verify_code['text'] = ''
-            self.label_passw_confirm['text'] = ''
-            self.label_confirmation_user['text'] = ''
+            self.create_account_window.destroy()
+            # self.label_confirmation['text'] = ''
+            # #Limpando as entradas, para facilitar a criação de uma nova conta.
+            # self.entry_login.delete(0, END)
+            # self.entry_password.delete(0, END)
+            # self.entry_age.delete(0, END)
+            # self.combo_country.current(30)
+            # self.entry_cpf.delete(0, END)
+            # self.entry_email.delete(0, END)
+            # self.entry_email_code.delete(0, END)
+            # self.entry_name.delete(0, END)
+            # self.entry_phone_number.delete(0, END)
+            # self.label_email_verify_code['text'] = ''
+            # self.label_passw_confirm['text'] = ''
+            # self.label_confirmation_user['text'] = ''
+            call(["python", self.PATH_FILE+"./main.py"])
             
         else:
             pass
@@ -392,7 +393,7 @@ class CreateAccount(ValidateEntry):
             self.CODE_GERATED += str(self.code_gerating_number)
     
     def send_email(self):
-
+       
         self.code_generator()
 
         rec_entry_email = self.entry_email.get()

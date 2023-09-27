@@ -4,6 +4,7 @@ import keyboard
 import os, sqlite3
 from time import sleep
 from PIL import ImageTk, Image
+from subprocess import call
 
 # Criando a janela de login
 class LoginUser:
@@ -92,9 +93,9 @@ class LoginUser:
 
     #Indo para janela de cadastro
     def window_register(self):
-        
-        from Register import CreateAccount
-        CreateAccount()
+
+        self.main_login_window.destroy()
+        call(["python", self.PATH_FILE_DIR+"./Register.py"])
 
     #Botão para se cadastrar
     def register_user(self):
