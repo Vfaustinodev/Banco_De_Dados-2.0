@@ -104,7 +104,7 @@ class LoginUser:
         register_account = customtkinter.CTkButton(master=self.frame, command=self.window_register, width=115, height=38, font=('Arial', 15), corner_radius=7, text='Criar Conta', fg_color='#0f9633')
         register_account.place(x=205, y=230)
 
-        lost_password = customtkinter.CTkButton(master=self.frame, width=80, height=25, font=('Arial', 15), corner_radius=7, text='Esqueceu a senha?', fg_color='transparent', hover_color='gray')
+        lost_password = customtkinter.CTkButton(master=self.frame, width=80, height=25, font=('Arial', 15), corner_radius=7, text='Esqueceu a senha?', fg_color='transparent', hover_color='gray', cursor='hand2')
         lost_password.place(x=125, y=294)
 
     #Chamando a o Button para inicialização
