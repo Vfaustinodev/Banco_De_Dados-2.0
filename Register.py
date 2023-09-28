@@ -211,6 +211,8 @@ class CreateAccount(ValidateEntry):
         button_valid_email = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_email, width=50, height=25, text='Confirmar', cursor='hand2', bg_color='#faf8f7', corner_radius=20)
         button_valid_email.place(x=285, y=337)
 
+        
+
     #Função responsavél por receber e validar duas funções, função de Label e função de envio de dados ao Banco.
     def recept_informations(self):
 
