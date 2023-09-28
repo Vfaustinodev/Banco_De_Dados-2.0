@@ -5,7 +5,6 @@ from tkinter import *
 from tkinter import messagebox
 import sqlite3
 import os, re
-from time import sleep
 import smtplib, email.message, random, string
 from PIL import ImageTk, Image
 from subprocess import call
@@ -49,7 +48,6 @@ class ValidateEntry:
 class CreateAccount(ValidateEntry):
 
     #Variaveis de flexibilidade
-    CODE_GERATED = '******'
     rec_year_actual = datetime.now()
     ACTUAL_YEAR = rec_year_actual.year
     PATH_FILE = os.path.dirname(__file__)
@@ -303,10 +301,10 @@ class CreateAccount(ValidateEntry):
         
         #Capturando o horário exato em que o registrado é feito.
         rec_hours = datetime.now()
-        HOURS = rec_hours.hour
-        MINUTES = rec_hours.minute
+        self.HOURS = rec_hours.hour
+        self.MINUTES = rec_hours.minute
         SECONDS = rec_hours.second
-        CAPTURE_HOUR = f'{HOURS:02}:{MINUTES:02}:{SECONDS:02}'
+        CAPTURE_HOUR = f'{self.HOURS:02}:{self.MINUTES:02}:{SECONDS:02}'
 
         #Capturando os dados de entrada dos metódos de entrada.
         rec_entry_login = self.entry_login.get()
@@ -379,7 +377,7 @@ class CreateAccount(ValidateEntry):
             self.CODE_GERATED += str(self.code_gerating_number)
     
     def send_email(self):
-       
+        
         self.code_generator()
 
         rec_entry_email = self.entry_email.get()
@@ -451,6 +449,11 @@ class CreateAccount(ValidateEntry):
             self.label_passw_confirm['text'] = 'SENHA FRACA!'
             self.label_passw_confirm['fg'] = 'red'
             self.password_response = False
+    
+    def back_login_window(self):
+        
+        self.create_account_window.destroy()
+        call(["python", self.PATH_FILE+"./main.py"])
 
 if __name__ == '__main__':
     CreateAccount()
