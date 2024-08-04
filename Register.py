@@ -22,18 +22,6 @@ class ValidateEntry:
             return False
         return len(value) <= len(num_age) and int(value) <= 150
     
-    def validating_cpf_entry(self, cpf):
-        num = '9' * 11
-        if cpf == '': return True
-
-        try:
-            value = int(cpf)
-            value = str(cpf)
-        except ValueError:
-            return False
-        
-        return len(value) <= len(num)
-    
     def limited_name_entry(self, name):
         num = '9' * 60
         if name == '': return True
@@ -73,7 +61,7 @@ class CreateAccount(ValidateEntry):
 
     # Método que faz a leitura do arquivo onde contém todos os paises do mundo e envia para uma lista que vai ser lida pelo ComboBox.
     country_add = []
-    with open(PATH_FILE + './files/country.txt', 'r', encoding='utf8') as country_entry:
+    with open(PATH_FILE + '/files/country.txt', 'r', encoding='utf8') as country_entry:
 
         for indice in country_entry.readlines():
             formatin_country = indice.strip('\n')
@@ -156,10 +144,18 @@ class CreateAccount(ValidateEntry):
         self.label_passw_confirm = Label(self.create_account_window, width=15, height=1, text='', bg='#faf8f7', font=('Arial 9'))
         self.label_passw_confirm.place(x=240, y=75)
 
+        self.label_confirmation_user = Label(self.create_account_window, width=22, height=1, text='', fg='green', bg='#faf8f7', font=('Times 8'))
+        self.label_confirmation_user.place(x=255, y=26)
+
+        self.label_confirmation = Label(self.create_account_window, width=6, height=1, text='', fg='green', bg='#faf8f7')
+        self.label_confirmation.place(x=100, y=241)
+
     #Função responsável por receber as informações digitadas pelo usuário.
     def entry_infos(self):
         
-        self.entry_login = Entry(self.create_account_window, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
+        text_nick = StringVar()
+        text_nick.trace("w", lambda name, index, mode, text_nick=text_nick: self.verify_nickname(text_nick))
+        self.entry_login = Entry(self.create_account_window, textvariable=text_nick, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_login.place(x=155, y=50)
 
         text_password = StringVar()
@@ -171,7 +167,8 @@ class CreateAccount(ValidateEntry):
         self.entry_age = Entry(self.create_account_window, validate='key', validatecommand= self.validate_age, width=15, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_age.place(x=155, y=150)
 
-        self.entry_cpf = Entry(self.create_account_window, validate='key', validatecommand=self.validated_cpf, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
+        
+        self.entry_cpf = Entry(self.create_account_window, validate='key', validatecommand=self.cpf_validating, width=40, font=('Arial 11'), bg='#faf8f7', relief='raised')
         self.entry_cpf.place(x=155, y=240)
 
         self.entry_email = Entry(self.create_account_window, width=40, font=('Arial 11'), relief='raised', bg='#faf8f7')
@@ -199,9 +196,6 @@ class CreateAccount(ValidateEntry):
         button_valid_cpf = customtkinter.CTkButton(master=self.create_account_window, command=self.cpf_validating, width=50, height=25, text='Verificar', cursor='hand2', corner_radius=0)
         button_valid_cpf.place(x=490, y=238)
 
-        button_valid_nick = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_nickname, width=50, height=25, text='Verificar', cursor='hand2', corner_radius=0)
-        button_valid_nick.place(x=490, y=49)
-
         button_send_email = customtkinter.CTkButton(master=self.create_account_window, command=self.send_email, width=50, height=25, text='Enviar', cursor='hand2', corner_radius=20, bg_color='#faf8f7')
         button_send_email.place(x=490, y=288)
 
@@ -210,8 +204,6 @@ class CreateAccount(ValidateEntry):
 
         button_valid_email = customtkinter.CTkButton(master=self.create_account_window, command=self.verify_email, width=50, height=25, text='Confirmar', cursor='hand2', bg_color='#faf8f7', corner_radius=20)
         button_valid_email.place(x=285, y=337)
-
-        
 
     #Função responsavél por receber e validar duas funções, função de Label e função de envio de dados ao Banco.
     def recept_informations(self):
@@ -224,9 +216,7 @@ class CreateAccount(ValidateEntry):
 
             msg_sucess = f'Cadastro realizado com sucesso\nSeja Bem Vindo! {self.entry_login.get()}'
             messagebox.showinfo('Mensagem de boas vindas!', msg_sucess)
-            self.create_account_window.destroy()
-            call(["python", self.PATH_FILE+"./main.py"])
-            
+            self.create_account_window.destroy()         
         else:
             pass
 
@@ -250,48 +240,62 @@ class CreateAccount(ValidateEntry):
     def validate_cpf(self, cpf):
         
         cpf_formating = f"{cpf[0:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:11]}"
-        
+
         if not re.match(r'\d{3}\.\d{3}\.\d{3}-\d{2}', cpf_formating):
-            return False
+            self.cpf_response = False
+            return self.cpf_response
         
         numbers = [int(digit) for digit in cpf_formating if digit.isdigit()]
         
         if len(numbers) != 11 or len(set(numbers)) == 1:
-            return False
+            self.cpf_response = False
+            return self.cpf_response
         
         # Validação do segundo dígito verificador:
         sum_of_products = sum(a*b for a, b in zip(numbers[0:9], range(10, 1, -1)))
         expected_digit = (sum_of_products * 10 % 11) % 10
+
         if numbers[9] != expected_digit:
-            return False
+            self.cpf_response = False
+            return self.cpf_response
 
         # Validação do segundo dígito verificador:
         sum_of_products = sum(a*b for a, b in zip(numbers[0:10], range(11, 1, -1)))
         expected_digit = (sum_of_products * 10 % 11) % 10
+
         if numbers[10] != expected_digit:
-            return False
+            self.cpf_response = False
+            return self.cpf_response
         
-        return True
+        self.cpf_response = True
+        return self.cpf_response
+        
+    def callback_cpf(self, entry_cpf):
+        
+        self.entry_cpf = entry_cpf
+        
+        if self.cpf_response == True:
+            self.label_confirmation['text'] = 'OK!'
+            self.label_confirmation['fg'] = 'green'
+
+        else:
+            self.label_confirmation['text'] = 'ERROR!'
+            self.label_confirmation['fg'] = 'red'
+            self.label_confirmation['width'] = 6
+            self.label_confirmation.place(x=100, y=241)
 
     def cpf_validating(self):
 
         rec_entry_cpf = self.entry_cpf.get()
 
         if self.validate_cpf(rec_entry_cpf) == True:
-            self.label_verify()
+            self.label_confirmation['text'] = 'OKAY!'
+            self.label_confirmation['fg'] = 'green'
             return True
-        
         else:
-            self.label_verify()
             self.label_confirmation['text'] = 'ERROR!'
             self.label_confirmation['fg'] = 'red'
-            self.label_confirmation['width'] = 6
-            self.label_confirmation.place(x=100, y=241)
-            
-    def label_verify(self):
 
-        self.label_confirmation = Label(self.create_account_window, width=6, height=1, text='OK!', fg='green', bg='#faf8f7')
-        self.label_confirmation.place(x=100, y=241)
             
     def sending_dates(self):
         #Capturando a data exata de registro.
@@ -329,29 +333,24 @@ class CreateAccount(ValidateEntry):
         #Confirmando o envio dos dados ao Banco de Dados.
         self.connected.commit()
 
-    def verify_nickname(self):
+    def verify_nickname(self, entry_login):
 
-        rec_entry_nick = self.entry_login.get()
+        self.entry_login = entry_login
         rec_nicks_only = '''SELECT login_user FROM tb_users_registed'''
         self.cursor.execute(rec_nicks_only)
         lines_obtained = self.cursor.fetchall()
 
         for lines_nicks in lines_obtained:
 
-            if lines_nicks[0] == rec_entry_nick or rec_entry_nick == '':
-
-                self.label_verify_user()
+            if lines_nicks[0] == self.entry_login.get() or self.entry_login.get() == '':               
                 self.label_confirmation_user['text'] = 'USUÁRIO INDISPONÍVEL!'
                 self.label_confirmation_user['fg'] = 'red'
-                return False
-                
-        self.label_verify_user()
-        return True
-             
-    def label_verify_user(self):
-
-        self.label_confirmation_user = Label(self.create_account_window, width=22, height=1, text='USUÁRIO DISPONÍVEL!', fg='green', bg='#faf8f7', font=('Times 8'))
-        self.label_confirmation_user.place(x=255, y=26)
+                self.response_nick = False
+                return self.response_nick
+            
+        self.label_confirmation_user['text'] = 'USUÁRIO DISPONÍVEL!'
+        self.label_confirmation_user['fg'] = 'green'
+        self.response_nick = True
 
     def verify_email(self):
         
@@ -408,13 +407,13 @@ class CreateAccount(ValidateEntry):
         self.counting_steps = 0
 
         #Validando CPF
-        if self.cpf_validating() == True:
+        if self.cpf_response == True:
             self.counting_steps += 1
         else:
             self.entry_cpf.delete(0, END)
 
         #Validando NickName
-        if self.verify_nickname() == True:
+        if self.response_nick == True:
             self.counting_steps += 1
         else:
             self.entry_login.delete(0, END)
@@ -434,7 +433,6 @@ class CreateAccount(ValidateEntry):
     def validate_entry_age(self):
         
         self.validate_age = (self.create_account_window.register(self.validating_age_entry), '%P')
-        self.validated_cpf = (self.create_account_window.register(self.validating_cpf_entry), '%P')
         self.validated_name = (self.create_account_window.register(self.limited_name_entry), '%P')
 
     #Função responsável por validar a senha em tempo real
